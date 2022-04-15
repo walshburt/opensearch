@@ -76,25 +76,18 @@ async function createBooks() {
   }
 }	
 
-/*
 async function createStores() {
   var indexName = 'stores';
-  createIndex(indexName);
-  _.range(1,50).forEach(id=> {
-   try {
+//  createIndex(indexName);
+  for (const id in _.range(1,50)) {
      var response = await client.index({
        id: id,
        index: indexName, 
-       body: getBookDoc(), 
+       body : {"store": stores[numberInRange(50)]},
        refresh: true,
      });
-    }
-    catch(e) {
-      console.log(e);
-    }
-  });	
+  };	
 }
-*/
 
 async function deleteIndex(indexName) {
   var response = await client.indices.delete({
@@ -126,13 +119,17 @@ async function doSearch() {
   if (body && body.datarows) {
         //console.log("SECOND join " + JSON.stringify(body.datarows));
         console.log("SECOND join " + JSON.stringify(body.datarows.length));
+/*
+	body.datarows.forEach(x=> {
+		console.log(x);
+	});
+*/
   }
   else {
         console.log("NO BODY 2 data");
   }
 }
 
-//createStores();
 
 // do sql
 //deleteStores();
@@ -140,5 +137,7 @@ async function doSearch() {
 
 //deleteIndex('books');
 
-//createBooks();
+createStores();
+createBooks();
 doSearch();
+console.log("done");
