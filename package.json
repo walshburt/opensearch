@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@opensearch-project/opensearch": "^1.1.0"
+    "@opensearch-project/opensearch": "^1.1.0",
+    "lodash": "^4.17.21",
+    "random-words": "^1.1.2"
   }
 }

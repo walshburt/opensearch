@@ -25,7 +25,9 @@ var client = new Client({
 */
 });
 
-async function search() {
+
+function createIndex(index_name) {
+
   // Create an index with non-default settings.
   var index_name = "books";
   var settings = {
@@ -41,6 +43,14 @@ async function search() {
     index: index_name,
     body: settings,
   });
+
+}
+
+function destroyIndex(index_name) {
+
+
+}
+
 
   var index_name2 = "store";
   var settings = {
