@@ -21,7 +21,8 @@ var stores = randomWords(50);
 var descriptions = randomWords({exactly:50, wordsPerString:5});
 
 
-async createIndex(indexName) {
+async function createIndex(indexName) {
+ try {
   var index_name = indexName;
   var settings = {
     settings: {
@@ -35,9 +36,13 @@ async createIndex(indexName) {
       index: index_name,
       body: settings,
   });
+ }
+ catch(e) {
+	console.log('create index ' + indexName + ' error ' + e);
+ }
 }
 
-async deleteIndex(indexName) {
+async function deleteIndex(indexName) {
   var response = await client.indices.delete({
     index: indexName,
   });
@@ -50,39 +55,46 @@ function numberInRange(top) {
 function getBookDoc() {
   // Add a document to the index.
   return {
-    title: titles[numberInRange(19)];
-    author: author[numberInRange(19)];  
-    year: years[numberInRange(10)]; 
-    content: content[numberInRange(50)]; 
-    store: stores[numberInRange(50)]; 
+    title: titles[numberInRange(19)],
+    author: author[numberInRange(19)],  
+    year: years[numberInRange(10)], 
+    content: content[numberInRange(50)],
+    store: stores[numberInRange(50)] 
   };
 }
 
 async function createBooks() {
   var indexName = 'books';
-  createIndex(indexName);
-  _.range(1,1000).forEach(id=> {
+//  createIndex(indexName);
+  for (const id in _.range(1,1000)) {
      var response = await client.index({
        id: id,
        index: indexName, 
        body: getBookDoc(), 
        refresh: true,
      });
-  });	
-}
+  }
+}	
 
+/*
 async function createStores() {
   var indexName = 'stores';
   createIndex(indexName);
   _.range(1,50).forEach(id=> {
+   try {
      var response = await client.index({
        id: id,
        index: indexName, 
        body: getBookDoc(), 
        refresh: true,
      });
+    }
+    catch(e) {
+      console.log(e);
+    }
   });	
 }
+*/
 
 async function deleteIndex(indexName) {
   var response = await client.indices.delete({
@@ -102,11 +114,31 @@ async function deleteBooks() {
 
 }
 
+async function doSearch() {
+  var { body }  = await client.transport.request({
+    method: "POST",
+    path: "_plugins/_sql",
+    body: {
+      query: "select * from books"
+    }
+  })
+      //query: "select * from books inner join store on books.store = store.store"
+  if (body && body.datarows) {
+        //console.log("SECOND join " + JSON.stringify(body.datarows));
+        console.log("SECOND join " + JSON.stringify(body.datarows.length));
+  }
+  else {
+        console.log("NO BODY 2 data");
+  }
+}
+
 //createStores();
-createBooks();
 
 // do sql
 //deleteStores();
 //deleteBooks();
 
-deleteIndex('books');
+//deleteIndex('books');
+
+//createBooks();
+doSearch();
