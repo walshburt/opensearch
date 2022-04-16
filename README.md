@@ -14,8 +14,11 @@ https://opensearch.org/docs/latest/search-plugins/sql/index/
 \
 \
 \
-TRINO for querying accross technologies (ES, relational and non-sql db....) with SQL
+TRINO  (or Presto)  for querying accross technologies (ES, relational and non-sql db....) with SQL
 \
 https://trino.io/
 \
 docker run -p 8080:8080 --name trino trinodb/trino
+\
+\
+Good Presto overview https://www.youtube.com/watch?v=67gXN5697Vw
