@@ -1,5 +1,7 @@
 "use strict";
 
+//https://www.npmjs.com/package/@opensearch-project/opensearch
+
 var host = "localhost";
 var protocol = "http";
 var port = 9200;
@@ -43,9 +45,14 @@ async function createIndex(indexName) {
 }
 
 async function deleteIndex(indexName) {
-  var response = await client.indices.delete({
-    index: indexName,
-  });
+  try {
+     var response = await client.indices.delete({
+       index: indexName,
+     });
+  }
+  catch(e) {
+	console.log('delete index ' + indexName + ' error ' + e);
+  }
 }
 
 function numberInRange(top) {
@@ -64,29 +71,37 @@ function getBookDoc() {
 }
 
 async function createBooks() {
-  var indexName = 'books';
-//  createIndex(indexName);
-  for (const id in _.range(1,1000)) {
-     var response = await client.index({
-       id: id,
-       index: indexName, 
-       body: getBookDoc(), 
-       refresh: true,
-     });
+  try {
+    var indexName = 'books';
+    for (const id in _.range(1,100)) {
+       var response = await client.index({
+         id: id,
+         index: indexName, 
+         body: getBookDoc(), 
+         refresh: true,
+       });
+    }
+  }
+  catch(e) {
+	console.log('create books ' + e);
   }
 }	
 
 async function createStores() {
-  var indexName = 'stores';
-//  createIndex(indexName);
-  for (const id in _.range(1,50)) {
-     var response = await client.index({
-       id: id,
-       index: indexName, 
-       body : {"store": stores[numberInRange(50)]},
-       refresh: true,
-     });
-  };	
+  try {
+     var indexName = 'stores';
+     for (const id in _.range(1,50)) {
+        var response = await client.index({
+          id: id,
+          index: indexName, 
+          body : {"store": stores[id-1], "description" : descriptions[id-1]},
+          refresh: true,
+        });
+     };	
+  }
+  catch(e) {
+	console.log('create stores exception ' + e);
+  }
 }
 
 async function deleteIndex(indexName) {
@@ -98,7 +113,6 @@ async function deleteIndex(indexName) {
 async function deleteBooks() {
   deleteIndex('books');
 
-
   // Delete the document.
   var response = await client.delete({
     index: index_name2,
@@ -108,36 +122,148 @@ async function deleteBooks() {
 }
 
 async function doSearch() {
-  var { body }  = await client.transport.request({
-    method: "POST",
-    path: "_plugins/_sql",
-    body: {
-      query: "select * from books"
-    }
-  })
-      //query: "select * from books inner join store on books.store = store.store"
-  if (body && body.datarows) {
-        //console.log("SECOND join " + JSON.stringify(body.datarows));
-        console.log("SECOND join " + JSON.stringify(body.datarows.length));
-/*
+  try {
+
+//select books.content, stores.description from books inner join stores on books.store = stores.store where books.content like '%me%'
+         //query: "select books.content from books inner join stores on books.store = stores.store WHERE match(books.content,\"me wife\",operator=and)" 
+     var { body }  = await client.transport.request({
+       method: "POST",
+       path: "_plugins/_sql",
+       body: {
+         query: "select content from books WHERE match(content,\"me wife\", operator=or)" 
+       }
+     })
+     if (body && body.datarows) {
 	body.datarows.forEach(x=> {
-		console.log(x);
+	   console.log(x);
 	});
-*/
-  }
-  else {
+     }
+     else {
         console.log("NO BODY 2 data");
+     }
+  }
+  catch(e) {
+	console.log('search error ' + e);
   }
 }
 
+async function doSearchBooks() {
+  try {
+     console.log('doSearchBooks');
+     var { body }  = await client.transport.request({
+       method: "POST",
+       path: "_plugins/_sql",
+       body: {
+         query: "select * from books" 
+       }
+     })
 
-// do sql
-//deleteStores();
-//deleteBooks();
+     if (body && body.datarows) {
+        console.log('rows' + body.datarows.length);
+        for (const item in body.datarows) {
+	   console.log(body.datarows[item]);
+	}
+     }
+     else {
+        console.log("NO BODY 2 data");
+     }
+  }
+  catch(e) {
+	console.log('search error ' + e);
+  }
+}
 
-//deleteIndex('books');
+async function doSearchStores() {
+  try {
+     console.log('doSearchStores');
+     var { body }  = await client.transport.request({
+       method: "POST",
+       path: "_plugins/_sql",
+       body: {
+         query: "select * from stores" 
+       }
+     })
+     if (body && body.datarows) {
+        console.log('rows' + body.datarows.length);
+        for (const item in body.datarows) {
+	   console.log(body.datarows[item]);
+	}
+     }
+     else {
+        console.log("NO BODY 2 data");
+     }
+  }
+  catch(e) {
+	console.log('search error ' + e);
+  }
+}
 
-createStores();
-createBooks();
-doSearch();
-console.log("done");
+async function deleteAll(indexName) {
+  try {
+      client.deleteByQuery({
+        index: indexName,
+        type: '_doc',
+        body: {
+          query: {
+            match_all : {}
+          }
+        }
+      })
+  }
+  catch(e) {
+     console.log('deleteAll index ' + indexName + ' error ' + e);
+  }
+}
+
+async function runit() {
+
+   // do sql
+   //deleteStores();
+   //deleteBooks();
+
+//   await deleteIndex('books');
+ //  await deleteIndex('stores');
+
+//await deleteAll('stores'); 
+//await deleteAll('books'); 
+//await doSearchStores();
+//await deleteIndex('stores');
+//await deleteIndex('books');
+
+
+//await createIndex('books');
+//await createIndex('stores');
+
+//   await createStores();
+ //  await createBooks();
+
+
+  await doSearch();
+  //await doSearchStores();
+//  await doSearchBooks();
+   console.log("done");
+}
+
+runit();
+
+
+async function baseQuery() {
+    // Search for the document.
+    var query = {
+        'query': {
+            'match_all' : {}
+        }
+    }
+
+    var response = await client.search({
+        index: 'books',
+        body: query
+    })
+
+    const fullArray = response?.body?.hits?.hits;
+    for (const i in fullArray) { 
+	console.log(fullArray[i]._source);
+    }
+}
+
+//baseQuery();
