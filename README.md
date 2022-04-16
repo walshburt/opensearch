@@ -22,3 +22,5 @@ docker run -p 8080:8080 --name trino trinodb/trino
 \
 \
 Good Presto overview https://www.youtube.com/watch?v=67gXN5697Vw
+\
+Free book https://www.starburst.io/info/oreilly-trino-guide/
