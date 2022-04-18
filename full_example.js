@@ -121,32 +121,6 @@ async function deleteBooks() {
 
 }
 
-async function doSearch() {
-  try {
-
-//select books.content, stores.description from books inner join stores on books.store = stores.store where books.content like '%me%'
-         //query: "select books.content from books inner join stores on books.store = stores.store WHERE match(books.content,\"me wife\",operator=and)" 
-     var { body }  = await client.transport.request({
-       method: "POST",
-       path: "_plugins/_sql",
-       body: {
-         query: "select content from books WHERE match(content,\"me wife\", operator=or)" 
-       }
-     })
-     if (body && body.datarows) {
-	body.datarows.forEach(x=> {
-	   console.log(x);
-	});
-     }
-     else {
-        console.log("NO BODY 2 data");
-     }
-  }
-  catch(e) {
-	console.log('search error ' + e);
-  }
-}
-
 async function doSearchBooks() {
   try {
      console.log('doSearchBooks');
@@ -214,6 +188,34 @@ async function deleteAll(indexName) {
      console.log('deleteAll index ' + indexName + ' error ' + e);
   }
 }
+
+async function doSearch() {
+  try {
+//select content from books inner join stores on books.store = stores.store where match(content,"this is", operator="AND")
+//select content from books inner join stores on books.store = stores.store 
+//select content from books inner join stores on books.store = stores.store where content like '%this%is%'
+
+     var { body }  = await client.transport.request({
+       method: "POST",
+       path: "_plugins/_sql",
+       body: {
+         query: "select content from books where match(content,\"graph truck\", operator=\"AND\")"
+       }
+     })
+     if (body && body.datarows) {
+	body.datarows.forEach(x=> {
+	   console.log(x);
+	});
+     }
+     else {
+        console.log("NO BODY 2 data");
+     }
+  }
+  catch(e) {
+	console.log('search error ' + e);
+  }
+}
+
 
 async function runit() {
 
