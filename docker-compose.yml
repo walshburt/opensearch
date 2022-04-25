@@ -39,7 +39,22 @@ services:
       - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
     networks:
       - opensearch-net
- 
+
+  mysql:
+    image: mysql:latest 
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+       MYSQL_ROOT_PASSWORD: example
+    ports:
+       - 3306:3306
+    volumes:
+      - "./scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql"
+      - "./scripts/data.sql:/docker-entrypoint-initdb.d/2.sql" 
+    networks:
+     - opensearch-net
+
   trino:
     image: trinodb/trino:latest
     container_name: trino
