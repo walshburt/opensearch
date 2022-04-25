@@ -3,6 +3,7 @@ services:
   opensearch-node1:
     image: opensearchproject/opensearch:1.3.1
     container_name: opensearch-node1
+    hostname: opensearch
     environment:
       - cluster.name=opensearch-cluster
       - node.name=opensearch-node1
@@ -38,6 +39,17 @@ services:
       - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
     networks:
       - opensearch-net
+ 
+  trino:
+    image: trinodb/trino:latest
+    container_name: trino
+    hostname: trino
+    ports:
+     - 8080:8080
+    expose:
+     - 8080
+    networks:
+     - opensearch-net
 
 volumes:
   opensearch-data1:

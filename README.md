@@ -1,26 +1,45 @@
-# opensearch
-\
+
+
+To start 
+
 docker-compose up -d
-\
-npm install
-\
-node o.js
-\
-REFS:
-\
-https://opensearch.org/docs/latest/search-plugins/sql/sql-full-text/
-\
-https://opensearch.org/docs/latest/search-plugins/sql/index/
-\
-\
-\
-TRINO  (or Presto)  for querying accross technologies (ES, relational and non-sql db....) with SQL
-\
-https://trino.io/
-\
-docker run -p 8080:8080 --name trino trinodb/trino
-\
-\
-Good Presto overview https://www.youtube.com/watch?v=67gXN5697Vw
-\
-Free book https://www.starburst.io/info/oreilly-trino-guide/
+
+Add data to the elasticsearch instance
+
+(load node js)
+
+npm install 
+node full_example.js
+
+docker exec -it trino /bin/sh
+
+vi /etc/trino/catalog/elasticsearch.properties
+
+(Connector reference https://trino.io/docs/current/connector/elasticsearch.html)
+
+add the following contents to the file
+
+connector.name=elasticsearch
+elasticsearch.host=localhost
+elasticsearch.port=9200
+elasticsearch.default-schema-name=default
+
+save the file, exit the container
+
+docker restart trino
+
+docker exec -it trino /bin/sh
+
+type trino
+
+at the trino prompt
+
+select books.author, books.store from elasticsearch.default.stores inner join elasticsearch.default.books on stores.store = books.store limit 10;
+
+
+Add bulk data to the elasticsearch instance if desired
+
+curl -X POST -H 'Content-Type: application/json' --data-binary @sample-movies.bulk localhost:9200/_bulk
+
+
+*** Free book https://www.starburst.io/info/oreilly-trino-guide/

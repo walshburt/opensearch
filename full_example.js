@@ -233,11 +233,11 @@ async function runit() {
 //await deleteIndex('books');
 
 
-//await createIndex('books');
-//await createIndex('stores');
+await createIndex('books');
+await createIndex('stores');
 
-//   await createStores();
- //  await createBooks();
+   await createStores();
+   await createBooks();
 
 
   await doSearch();
