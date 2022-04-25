@@ -69,6 +69,10 @@ log off the mysql container and restart trino
 
 docker restart trino
 
+docker exec -it trino /bin/sh
+
+start trino command line
+
 
 Add bulk data to the elasticsearch instance if desired
 
