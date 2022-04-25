@@ -1,5 +1,7 @@
 
 
+THIS RUNS ON AWS OVER EMR (https://aws.amazon.com/emr/features/presto/)
+
 To start 
 
 docker-compose up -d
