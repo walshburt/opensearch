@@ -19,10 +19,10 @@ vi /etc/trino/catalog/elasticsearch.properties
 
 add the following contents to the file
 
-connector.name=elasticsearch
-elasticsearch.host=localhost
-elasticsearch.port=9200
-elasticsearch.default-schema-name=default
+connector.name=elasticsearch\
+elasticsearch.host=opensearch\
+elasticsearch.port=9200\
+elasticsearch.default-schema-name=default\
 
 save the file, exit the container
 
